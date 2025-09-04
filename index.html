@@ -1,68 +1,17 @@
-import 'dotenv/config';
-import express from 'express';
-import { Telegraf } from 'telegraf';
-
-const { BOT_TOKEN, WEBAPP_URL, PORT = 3000 } = process.env;
-if (!BOT_TOKEN) {
-  console.error('❌ BOT_TOKEN is missing');
-  process.exit(1);
-}
-
-const bot = new Telegraf(BOT_TOKEN);
-
-// Логи всего входящего
-bot.use((ctx, next) => {
-  console.log('➡️ Update:', ctx.updateType, ctx.update?.message?.text);
-  return next();
-});
-
-// /start с кнопкой WebApp
-bot.start((ctx) => {
-  console.log('💬 /start from', ctx.from?.id, ctx.from?.username);
-  return ctx.reply('Запускаем мини-приложение 👇', {
-    reply_markup: {
-      keyboard: [[{ text: 'Открыть шкалу', web_app: { url: WEBAPP_URL } }]],
-      resize_keyboard: true,
-    },
-  });
-});
-
-// Приём данных из WebApp
-bot.on('message', async (ctx) => {
-  const data = ctx.message?.web_app_data?.data;
-  if (!data) return;
-  console.log('📦 web_app_data:', data);
-  try {
-    const payload = JSON.parse(data);
-    if (payload.type === 'deal') {
-      const amount = Number(payload.amount || 0);
-      const total = Number(payload.monthly_sum || 0);
-      await ctx.reply(
-        `Зачли: ${amount.toLocaleString('ru-RU')} ✅\nИтого за месяц: ${total.toLocaleString('ru-RU')}`
-      );
-    }
-  } catch (e) {
-    console.error('❌ parse web_app_data failed', e);
-  }
-});
-
-const app = express();
-app.get('/', (_, res) => res.send('HTTP OK: bot process is running'));
-app.listen(PORT, () => console.log('🌐 HTTP on', PORT));
-
-// ЯВНО выключаем вебхук и запускаем long polling
-(async () => {
-  try {
-    const me = await bot.telegram.getMe();
-    console.log(`✅ Bot token OK: @${me.username}`);
-    await bot.telegram.deleteWebhook();
-    console.log('🔧 Webhook deleted');
-    await bot.launch({ dropPendingUpdates: true });
-    console.log('🚀 Long polling launched');
-  } catch (e) {
-    console.error('❌ launch failed:', e);
-  }
-})();
-
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM'));
+<!doctype html><html lang="ru"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>MoneyHammer — Sales Gauge</title>
+<link rel="stylesheet" href="./style.css"/>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head><body>
+<div id="bg"></div>
+<div id="app">
+  <header><div class="stat"><div class="label">Сумма месяца</div><div class="value"><span id="sumText">0</span> / 300k</div></div>
+    <div class="stat"><div class="label">Уровень</div><div class="value"><span id="levelText">1</span>/15</div></div>
+    <div class="stat"><div class="label">Сделок</div><div class="value"><span id="dealsText">0</span></div></div></header>
+  <div id="gauge"><div id="tube"><div class="ticks"></div><div id="fill"></div><div id="glow"></div></div></div>
+  <div id="actions"><button id="addDeal">+ Сделка</button><button id="historyBtn">История</button><button id="yearBtn">Карта года</button></div>
+  <div id="modal" class="hidden"><div class="card"><div class="title">Добавить сделку</div>
+    <input id="dealInput" type="number" placeholder="Сумма, напр. 25000"/><div class="row">
+    <button id="cancel">Отмена</button><button id="save">Сохранить</button></div></div></div>
+</div><script src="./app.js"></script></body></html>
