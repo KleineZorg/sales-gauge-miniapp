@@ -1,17 +1,84 @@
-<!doctype html><html lang="ru"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>MoneyHammer — Sales Gauge</title>
-<link rel="stylesheet" href="./style.css"/>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-</head><body>
-<div id="bg"></div>
-<div id="app">
-  <header><div class="stat"><div class="label">Сумма месяца</div><div class="value"><span id="sumText">0</span> / 300k</div></div>
-    <div class="stat"><div class="label">Уровень</div><div class="value"><span id="levelText">1</span>/15</div></div>
-    <div class="stat"><div class="label">Сделок</div><div class="value"><span id="dealsText">0</span></div></div></header>
-  <div id="gauge"><div id="tube"><div class="ticks"></div><div id="fill"></div><div id="glow"></div></div></div>
-  <div id="actions"><button id="addDeal">+ Сделка</button><button id="historyBtn">История</button><button id="yearBtn">Карта года</button></div>
-  <div id="modal" class="hidden"><div class="card"><div class="title">Добавить сделку</div>
-    <input id="dealInput" type="number" placeholder="Сумма, напр. 25000"/><div class="row">
-    <button id="cancel">Отмена</button><button id="save">Сохранить</button></div></div></div>
-</div><script src="./app.js"></script></body></html>
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MoneyHammer — Sales Gauge</title>
+  <link rel="stylesheet" href="./style.css" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+  <!-- Фон + лампочки -->
+  <div id="bg">
+    <div class="lamp c1" style="top:10%; left:10%"></div>
+    <div class="lamp c2" style="top:28%; right:12%"></div>
+    <div class="lamp c3" style="bottom:20%; left:22%"></div>
+    <div class="lamp c1" style="bottom:28%; right:18%"></div>
+  </div>
+
+  <div id="app">
+    <!-- Верхние бейджи -->
+    <header>
+      <div class="stat">
+        <div class="label">Сумма месяца</div>
+        <div class="value"><span id="sumText">0</span> / 300k</div>
+      </div>
+      <div class="stat">
+        <div class="label">Уровень</div>
+        <div class="value"><span id="levelText">1</span>/15</div>
+      </div>
+      <div class="stat">
+        <div class="label">Сделок</div>
+        <div class="value"><span id="dealsText">0</span></div>
+      </div>
+    </header>
+
+    <!-- Шкала -->
+    <main id="gauge">
+      <div id="tube">
+        <div class="ticks"></div>
+        <div id="fill"></div>
+        <div id="glow"></div>
+        <div id="impact-pad"></div>
+      </div>
+    </main>
+
+    <!-- Нижний док: 2 ряда -->
+    <nav id="dock">
+      <div class="row">
+        <button id="addDeal" class="primary">💥 + Сделка</button>
+        <button id="historyBtn">📜 История</button>
+      </div>
+      <div class="row">
+        <button id="undoBtn">↩ Отменить</button>
+        <button id="yearBtn">📈 Карта года</button>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Модалка: Добавить сделку -->
+  <div id="modalAdd" class="modal hidden">
+    <div class="card">
+      <div class="title">Добавить сделку</div>
+      <input id="dealInput" type="number" inputmode="decimal" placeholder="Сумма, например 25000" />
+      <div class="row right">
+        <button data-close class="ghost">Отмена</button>
+        <button id="saveDeal" class="primary">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модалка: История/правка -->
+  <div id="modalHistory" class="modal hidden">
+    <div class="card">
+      <div class="title">История операций</div>
+      <ul id="historyList" class="history"></ul>
+      <div class="row right">
+        <button data-close class="primary">Готово</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
