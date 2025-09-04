@@ -64,8 +64,8 @@ function milestoneAlert(){
     setTimeout(()=>tg.MainButton.hide(), 2200);
   }
 }
-els.addDeal.addEventListener('click', openModal);
-els.cancel.addEventListener('click', closeModal);
-els.save.addEventListener('click', ()=>{ const v = Number(els.input.value); closeModal(); addDeal(v); });
+document.getElementById('addDeal').addEventListener('click', openModal);
+document.getElementById('cancel').addEventListener('click', closeModal);
+document.getElementById('save').addEventListener('click', ()=>{ const v = Number(els.input.value); closeModal(); addDeal(v); });
 render();
 setInterval(()=>{ const key = monthKey(); if(key !== state.key){ state = { key, monthly_sum: 0, deals_count: 0, history: [] }; saveState(); render(); } }, 60000);
